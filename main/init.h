@@ -1,0 +1,12 @@
+pib * create_pib(UINT32 process_ID, UINT32 process_priority, UINT32 stack, void * process, void * next_process);
+void init_traps( void );
+void init_memory( void );
+void init_mailbox( void );
+void init_queues( void );
+void create_processes( void );
+void init_scheduler( void );
+void init_io( void );
+void init_timer( void );
+void register_commands( void );
+void system_kickoff( void );
+extern void null_process( void );
