@@ -17,6 +17,7 @@
 #include "../process_management/process_management.h"
 #include "../priority/priority.h"
 #include "../io/uart.h"
+#include "../timer/timer.h"
 #include "../rtx/rtx_test.h"
 #include "../rtx/rtx_inc.h"
 #include "../rtx/rtx.h"
@@ -36,7 +37,15 @@ void create_processes(){
 		test_process = test_process->next_process;
 	}
 	
+
+	test_process->next_process = create_pib(CRT_PID, 0, 255,  &crt, NULL );
+	test_process = test_process->next_process;
+	
 	test_process->next_process = create_pib(KCD_PID, 0, 255,  &kcd, NULL );
+	test_process = test_process->next_process;
+	
+	test_process->next_process = create_pib(WALLCLOCK_PID, 0, 255,  &wallclock, NULL );
+	
 	return;
 }
 
@@ -65,7 +74,7 @@ int main()
 	system_kickoff();
 	(*proc_pointer)();
 	
-	rtx_dbug_outs((CHAR *)"rtx: Exiting main()\r\n");
+	rtx_dbug_outs((CHAR *)"\r\nrtx: Exiting main()\r\n");
 	return 0; //END 
 }
 

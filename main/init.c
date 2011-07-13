@@ -55,6 +55,7 @@ void init_mailbox()
 }
 
 void init_queues(){
+	clear_priority();
 	int priority;
 	
 	for( priority = 0; priority < 4; priority++ ){
@@ -66,7 +67,6 @@ void init_queues(){
 }
 
 void init_scheduler(){
-	//set global priority
 	total_procs = NUM_PROCESSES;
 	prio = 0;
 
@@ -115,6 +115,7 @@ void init_timer(){
     TIMER0_ICR = 0x9B;
     TIMER0_TRR = 1758;
     TIMER0_TMR = 0xFF1B;
+	timer_display = 0;
 	atomic_down();
 	return;
 }
@@ -122,6 +123,7 @@ void init_timer(){
 void register_commands(){
 	kcd_msg = (CHAR *)malloc(64);
 	msg_length = 0;
+	current_command = OTHER;
 	init_key_head = register_command((CHAR *)"W");	
 	register_command((CHAR *)"WS");
 	register_command((CHAR *)"WT");

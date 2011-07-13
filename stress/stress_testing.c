@@ -35,7 +35,7 @@ void stress_a(){
 	void * p = request_memory_block();
 	register_command((CHAR *)"Z");
 	while(1){
-		if(*((CHAR *)current_command->keystroke) == "Z"){
+		if(current_command->keystroke) == OTHER){
 			release_memory_block(p);
 			break;
 		} else {

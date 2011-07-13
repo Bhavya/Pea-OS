@@ -8,6 +8,7 @@
 
 #include "dbug.h"
 #include "../shared/define.h"
+#include "../io/uart.h"
 
 /**
  * @brief: C Function wrapper for TRAP #15 function to output a character
@@ -84,22 +85,40 @@ VOID rtx_dbug_outs_int(CHAR * s, UINT32 n)
 
 VOID exception(ERROR_CODE err){
 	if(err == ERROR){
-	  rtx_dbug_outs((CHAR *)"ERROR CODE 0: ERROR\r\n");
+		uprintf((CHAR *)"\r\nERROR: Error.\r\n>");
 	} else if(err == INVALID_PRIORITY){
-	  rtx_dbug_outs((CHAR *)"ERROR CODE 1: INVALID PRIORITY\r\n");
+		uprintf((CHAR *)"\r\nERROR: Invalid priority\r\n>");
 	} else if(err == MSG_INVALID_PROCESS){
-	  rtx_dbug_outs((CHAR *)"ERROR CODE 2: MESSAGE SENT TO NON-EXISTENT PROCESS\r\n");
+		uprintf((CHAR *)"\r\nERROR: Message sent to non-existent process.\r\n>");
 	} else if(err == SET_PRIO_INVALID_PROCESS){
-	  rtx_dbug_outs((CHAR *)"ERROR CODE 3: TRIED TO CHANGE PRIORITY ON NON-EXISTENT PROCESS\r\n");
+		uprintf((CHAR *)"\r\nERROR: Tried to change priority on non-existent or kernel-owned process.\r\n>");
 	} else if(err == INVALID_HOTKEY){
-	  rtx_dbug_outs((CHAR *)"ERROR CODE 4: INVALID HOTKEY\r\n");
-	} else if(err == INVALID_HOTKEY_PARAMETER){
-	  rtx_dbug_outs((CHAR *)"ERROR CODE 5: INVALID HOTKEY PARAMTER\r\n");
+		uprintf((CHAR *)"\r\nERROR: Invalid hotkey.\r\n>");
+	} else if(err == INVALID_COMMAND){
+		uprintf((CHAR *)"\r\nERROR: Bad command.\r\n>");
+	} else if(err == INVALID_COMMAND_PARAMETER){
+		uprintf((CHAR *)"\r\nERROR: Invalid command parameter.\r\n>");
 	} else if(err == BLOCKED_ON_RECEIVE){
-	  rtx_dbug_outs((CHAR *)"ERROR CODE 6: BLOCKED ON RECEIVE\r\n");
+		uprintf((CHAR *)"\r\nERROR: Blocked on receive.\r\n>");
 	} else if(err == BLOCKED_ON_MEM){
-		rtx_dbug_outs((CHAR *)"ERROR CODE 7: BLOCKED ON MEMORY\r\n");
-	} 
+		uprintf((CHAR *)"\r\nERROR: Blocked on memory.\r\n>");
+	} else if(err == OUT_OF_MEM){
+		uprintf((CHAR *)"\r\nERROR: Out of memory.\r\n>");
+	} else if(err == MAILBOX_FULL){
+		uprintf((CHAR *)"\r\nERROR: Mailbox full. Please wait and try again.\r\n>");
+	} else if(err == INVALID_TIMESTAMP){
+		uprintf((CHAR *)"\r\nERROR: Invalid timestamp. Please use a hh:mm:ss format.\r\n 0 <= hh <= 23, 0 <= mm <= 59, 0 <= ss <= 59\r\n>");
+	} else if(err == NON_EXISTENT_PROCESS){
+		uprintf((CHAR *)"\r\nERROR: Non existent process referenced.\r\n>");
+	} else if(err == CANNOT_RELEASE){
+		uprintf((CHAR *)"\r\nERROR: Cannot release memory block.\r\n>");
+	} else if(err == SET_PRIO_SAME_PRIORITY){
+		uprintf((CHAR *)"\r\nERROR: Process already in this priority.\r\n>");
+	} if(err == REFERENCE_TERMINATED_PROCESS){
+		uprintf((CHAR *)"\r\nERROR: Terminated process referenced.\r\n>");
+	} if(err == WALLCLOCK_RUNNING){
+		uprintf((CHAR *)"\r\nERROR: Cannot run this command while wallclock is running. Please use %WS or %WT only.\r\n>");
+	}
 	return;
 }
 
@@ -140,7 +159,7 @@ VOID display_queue_all(){
 	pcb * temp;
 	int i;
 	for(i=0;i<4;i++){
-		rtx_dbug_outs_int((CHAR *)"\r\nReady Queue: Priority ", i);
+		rtx_dbug_outs_int((CHAR *)"\r\n Ready Queue: Priority ", i);
 		temp = ready_queue[i];
 		while(temp != NULL){
 			rtx_dbug_outs_int((CHAR *)"\r\n\tProcess ", temp->process_ID);
@@ -152,6 +171,16 @@ VOID display_queue_all(){
 	for(i=0;i<4;i++){
 	rtx_dbug_outs_int((CHAR *)"\r\n Blocked Msg Priority ", i);
 	temp = bmsg_queue[i];
+	while(temp != NULL){
+		rtx_dbug_outs_int((CHAR *)"\r\n\tProcess ", temp->process_ID);
+		temp = temp->next_process;
+	}	
+	rtx_dbug_outs((CHAR *)"\r\n"); 
+    }
+	
+	for(i=0;i<4;i++){
+	rtx_dbug_outs_int((CHAR *)"\r\n Blocked Mem Priority ", i);
+	temp = bmem_queue[i];
 	while(temp != NULL){
 		rtx_dbug_outs_int((CHAR *)"\r\n\tProcess ", temp->process_ID);
 		temp = temp->next_process;

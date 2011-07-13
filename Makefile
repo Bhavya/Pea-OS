@@ -18,9 +18,9 @@ LDFLAGS_RTX = -Trtx/rtx.ld -Wl,-Map=rtx/rtx.map
 LDFLAGS_RTX_LOADER = -Trtx/rtx_loader.ld -Wl,-Map=rtx/rtx_loader.map
 LDFLAGS_RTX_TEST = -Trtx/rtx_test.ld -Wl,-Map=rtx/rtx_test.map
 
-RTX_OBJS = rtx.o dbug.o main_rtx.o memory.o messaging.o priority.o process_management.o uart.o kcd.o timer.o init.o
-RTX_LOADER_OBJS = rtx.o dbug.o rtx_loader.o memory.o messaging.o priority.o process_management.o uart.o kcd.o timer.o init.o
-RTX_TEST_DUMMY_OBJS = rtx.o dbug.o rtx_test_dummy.o memory.o messaging.o priority.o process_management.o kcd.o uart.o timer.o init.o
+RTX_OBJS = rtx.o dbug.o main_rtx.o memory.o messaging.o priority.o process_management.o uart.o kcd.o crt.o timer.o init.o
+RTX_LOADER_OBJS = rtx.o dbug.o rtx_loader.o memory.o messaging.o priority.o process_management.o uart.o kcd.o crt.o timer.o init.o
+RTX_TEST_DUMMY_OBJS = rtx.o dbug.o rtx_test_dummy.o memory.o messaging.o priority.o process_management.o kcd.o crt.o uart.o timer.o init.o
 
 all: mdummy.s19 
 
@@ -54,6 +54,9 @@ mdummy.s19: m2.s19 rtx_loader.s19
 timer.o: timer/timer.c timer/timer.h
 	$(CC) $(CFLAGS) -c timer/timer.c
 
+crt.o: io/crt.c io/uart.h
+	$(CC) $(CFLAGS) -c io/crt.c
+	
 kcd.o: io/kcd.c io/uart.h
 	$(CC) $(CFLAGS) -c io/kcd.c
 	

@@ -34,31 +34,27 @@ void success_rate(int success, int failure){
 /* third party dummy test process 1 */ 
 void test1()
 {
-	rtx_dbug_outs((CHAR *)"\r\nTest1");
-	void * p = g_test_fixture.request_memory_block();
-	g_test_fixture.send_message(2,write_message(p, (CHAR *)"HELLO FROM PROCESS 1\0"));
-	
-	g_test_fixture.release_processor();
-	rtx_dbug_outs((CHAR *)"\r\nTest1");
-	p = g_test_fixture.receive_message(NULL);
-	CHAR * s = read_message(p);
-	rtx_dbug_outs(s);
+	while(1){
+		rtx_dbug_outs((CHAR *)"\r\nTest1");
+		/*void * p;
+		p = g_test_fixture.receive_message(NULL);*/
+		g_test_fixture.release_processor();
+	}
 	return;
 }
 
 /* third party dummy test process 2 */ 
 void test2()
 {
-	rtx_dbug_outs((CHAR *)"\r\nTest2");
-	void * p = g_test_fixture.receive_message(NULL);
-	CHAR * s = read_message(p);
-	rtx_dbug_outs(s);
-	g_test_fixture.release_processor();
-	
-	rtx_dbug_outs((CHAR *)"\r\nTest2");
-	void * q = g_test_fixture.request_memory_block();
-	g_test_fixture.send_message(1,write_message(q, (CHAR *)"If you see this, process 1 was successfully unblocked\0"));
-	g_test_fixture.release_processor();
+	while(1){
+		rtx_dbug_outs((CHAR *)"\r\nTest2");
+		/*int i;
+		void * p[33];
+		for(i=0; i<33; i++){
+			p[i] = g_test_fixture.request_memory_block();
+		}*/
+		g_test_fixture.release_processor();
+	}
 	return;
 }
 /* third party dummy test process 3 */ 

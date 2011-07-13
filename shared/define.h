@@ -1,11 +1,9 @@
 #define NUM_MEM_BLKS 32
-#define NULL 0
-#define CHAR signed char
 #define NUM_PROCESSES 6
 
-#define KCD_PID 9
-#define UART_PID 28
-#define CRT_PID 29
+#define KCD_PID 7
+#define CRT_PID 8
+#define WALLCLOCK_PID 9
 
 /*Kernel Structure*/
 enum state
@@ -14,7 +12,8 @@ enum state
     READY_STATE,
     RUNNING_STATE,
 	BLOCKED_MSG_STATE,
-	BLOCKED_MEM_STATE
+	BLOCKED_MEM_STATE,
+	TERMINATED_STATE
 };
 
 typedef enum state state;
@@ -93,8 +92,20 @@ int prio;
 UINT32 old_fp;
 UINT32 temp_sp;
 
+extern void block_self( state );
 
-/*Interaction*/
+/*Interaction and IO*/
+enum command
+{
+	W,
+	WS,
+	WT,
+	C,
+	OTHER
+};
+
+typedef enum command command;
+
 struct command_key
 {
 	CHAR * keystroke; 		
@@ -105,7 +116,7 @@ typedef struct command_key command_key;
 
 command_key * init_key_head;
 command_key * init_key_tail;
-command_key * current_command;
+command current_command;
 UINT32 command_flag;
 CHAR * kcd_msg;
 int msg_length;
@@ -113,6 +124,9 @@ int msg_length;
 /*UART*/
 volatile BYTE CharIn;
 volatile BYTE CharOut;
+
+/*Timer*/
+UINT32 timer_display;
 
 /*Interrupts*/
 extern void atomic_up( void );

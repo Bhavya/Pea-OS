@@ -14,12 +14,17 @@ int release_processor()
 void process_bootstrap( pcb * control_block ){
 	proc_pointer = (control_block->process);
 	(*proc_pointer)();
+	control_block->process_state = TERMINATED_STATE;
 	remove_process(control_block);
-	running = NULL;
 	total_procs--;
 	if(total_procs > 0){
 		release_processor();
 	}
+	return;
+}
+
+void clear_priority(){
+	prio = 0;
 	return;
 }
 
@@ -99,7 +104,6 @@ pcb * remove_process(pcb * control_block){
 			}
 		}
 	}
-	
 	control_block->next_process = NULL;
 	
 	return control_block;
@@ -108,8 +112,7 @@ pcb * remove_process(pcb * control_block){
 int insert_blocked_process(pcb * control_block, UINT32 process_priority, state type){
 	pcb * current_process;
 	if(process_priority < 0 || process_priority > 3){
-		rtx_dbug_outs((CHAR *)"\r\n Process priority invalid value.");
-		return -1;
+		return RTX_ERROR;
 	} else {
 		control_block->process_priority = process_priority;
 	}
@@ -123,12 +126,12 @@ int insert_blocked_process(pcb * control_block, UINT32 process_priority, state t
 			}
 			control_block->process_state = BLOCKED_MSG_STATE;
 			current_process->next_process = control_block;
-			return 0;
+			return RTX_SUCCESS;
 		}
 		else if(bmsg_queue[process_priority] == NULL)
 		{
 			bmsg_queue[process_priority] = control_block;
-			return 0;
+			return RTX_SUCCESS;
 		} 
 	} else if(type == BLOCKED_MEM_STATE){
 		if(bmem_queue[process_priority] != NULL)
@@ -139,15 +142,18 @@ int insert_blocked_process(pcb * control_block, UINT32 process_priority, state t
 			}
 			control_block->process_state = BLOCKED_MEM_STATE;
 			current_process->next_process = control_block;
-			return 0;
+			return RTX_SUCCESS;
 		}
 		else if(bmem_queue[process_priority] == NULL)
 		{
 			bmem_queue[process_priority] = control_block;
-			return 0;
+			return RTX_SUCCESS;
 		} 
 	}	
-	return -1;
+	#ifdef _ERR
+		exception(ERROR);
+	#endif
+	return RTX_ERROR;
 }
 
 pcb * remove_blocked_process(pcb * control_block, state type){	
@@ -215,7 +221,7 @@ void context_switch(){
 	}
 	transition->process_state = READY_STATE;
 	
-	prio = 0;
+	clear_priority();
 	
 	while(1){
 		if(ready_queue[prio] != NULL){

@@ -8,14 +8,17 @@ int send_message (int process_ID, void * MessageEnvelope)
 {
 	pcb * pot_blocked;
 	
-	if(process_ID >= 1 || process_ID <= NUM_PROCESSES || process_ID == KCD_PID){
+	if(process_ID >= 1 || process_ID <= NUM_PROCESSES || process_ID == KCD_PID || process_ID == WALLCLOCK_PID){
 		int message = 0;
 		while(mailbox[message].sender_ID != -1){
 			message++;		
 		}
 		
 		if(message > 31){
-			return -1;
+			#ifdef _ERR_
+				exception(MAILBOX_FULL);
+			#endif
+			return RTX_ERROR;
 		} else {
 			mailbox[message].sender_ID = running->process_ID;
 			mailbox[message].destination_ID = process_ID;
@@ -39,16 +42,11 @@ int send_message (int process_ID, void * MessageEnvelope)
 	#ifdef _ERR_
 		exception(ERROR);
 	#endif
-    return -1;
+    return RTX_ERROR;
 }
 
 void * receive_message(int * sender_ID)
 {
-	#ifdef _DEBUG_
-        //rtx_dbug_outs((CHAR *)"rtx: receive message\r\n");
-	#endif
-
-	pib * init_block;
 	int message = 0;
 	while(mailbox[message].destination_ID != running->process_ID){
 		if(message > 31){
@@ -58,40 +56,15 @@ void * receive_message(int * sender_ID)
 		}
 	}
 	if(message < 32){	
-	
-		#ifdef _DEBUG_
-			//rtx_dbug_outs((CHAR *)"rtx: message received\r\n");
-		#endif		
-		
 		*sender_ID += mailbox[message].sender_ID;
 		mailbox[message].sender_ID = -1;
+		mailbox[message].destination_ID = -1;
 		red_lever--;		
 		return mailbox[message].msg_body;
 	} else {
-		init_block = init_blocks_head;
-		while(init_block != NULL){
-			if(init_block->process_ID == running->process_ID){
-				insert_blocked_process(remove_process(init_block->control_block), running->process_priority, BLOCKED_MSG_STATE);
-				release_processor();			
-				message = 0;
-				while(mailbox[message].destination_ID != running->process_ID){
-					if(message > 31){
-						break;
-					} else {
-						message++;	
-					}
-				}
-				if(message < 32){	
-					*sender_ID += mailbox[message].sender_ID;
-					mailbox[message].sender_ID = -1;
-					red_lever--;	
-					return mailbox[message].msg_body;
-				}
-				return 0x00;
-			} else {
-				init_block = init_block->next_process;
-			}
-		}
+		insert_blocked_process(remove_process(running), running->process_priority, BLOCKED_MSG_STATE);
+		release_processor();			
+		return receive_message(NULL);
 	}
 	return 0x00;
 }
@@ -139,7 +112,7 @@ void set_message_type(int i, int v){
 
 void * write_message( void * memory_block, CHAR * msg ){
 	int i=0;
-	while(*(msg+i) != '\0'){
+	while(*(msg+i) != '\0' || *(msg+i) != 0x00){
 		*((CHAR *)(memory_block+64+i)) = *(msg+i);
 		i++;
 	}

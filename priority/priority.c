@@ -8,7 +8,6 @@ int set_process_priority (int process_ID, int priority)
 {
 	pib * init_block = init_blocks_head;
 	pcb * control_block;
-	
 	if(priority < 0 || priority > 3){
 		#ifdef _ERR_
 			exception(INVALID_PRIORITY);
@@ -21,9 +20,19 @@ int set_process_priority (int process_ID, int priority)
 		while(init_block != NULL){
 			control_block = init_block->control_block;
 			if(init_block->process_ID == process_ID){		
-				insert_process(remove_process(control_block),priority);	
-				control_block->process_priority = priority;		
-				return 0;
+				if(control_block->process_priority == priority){
+					#ifdef _ERR_
+						exception(SET_PRIO_SAME_PRIORITY); 
+					#endif
+				} else if(control_block->process_state == TERMINATED_STATE){
+					#ifdef _ERR_
+						exception(REFERENCE_TERMINATED_PROCESS); 
+					#endif
+				} else {
+					insert_process(remove_process(control_block),priority);	
+					control_block->process_priority = priority;		
+					return RTX_SUCCESS;
+				}
 			}
 			init_block = init_block->next_process;
 			if(prio > priority){
@@ -31,7 +40,7 @@ int set_process_priority (int process_ID, int priority)
 			}
 		}
 	}
-	return -1;
+	return RTX_ERROR;
 }
 
 int get_process_priority (int process_ID)
@@ -51,5 +60,9 @@ int get_process_priority (int process_ID)
 		init_block = init_block->next_process;
 		}
 	}
-	return -1;
+	
+	#ifdef _ERR_
+		exception(NON_EXISTENT_PROCESS);
+	#endif
+	return RTX_ERROR;
 }

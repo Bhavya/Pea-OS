@@ -1,5 +1,6 @@
 extern int release_processor();
 extern void context_switch( void );
+extern void clear_priority( void );
 
 extern int insert_process(pcb *, UINT32);
 extern pcb * insert_new_process(pib *);

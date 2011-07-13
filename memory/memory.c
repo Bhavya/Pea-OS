@@ -24,7 +24,7 @@ void * malloc(UINT32 size)
 
 void * proc_malloc()
 {
-	UINT32 size = 255; //each process gets a stack of 255 bytes
+	UINT32 size = 512; //each process gets a stack of 255 bytes
 	void * oldHeap = heap;
 	heap += size;
 
@@ -33,6 +33,20 @@ void * proc_malloc()
 		*(BYTE *)(oldHeap+i) = 0x00;
 	}
 	return heap;
+}
+
+void unblock_single_waiting_process(){
+	pcb * temp;
+	int i;
+	for(i=0; i<4; i++){
+		temp = bmem_queue[i];
+		if(temp == NULL) continue;
+		while(temp->next_process != NULL){
+			temp = temp->next_process;
+		} 
+		insert_process(remove_blocked_process(temp,BLOCKED_MEM_STATE), temp->process_priority);
+	}
+	return;
 }
 
 void * request_memory_block() 
@@ -46,23 +60,26 @@ void * request_memory_block()
 		}
 	}
 	#ifdef _ERR_
-		exception(BLOCKED_ON_MEM);
+		exception(OUT_OF_MEM);
 	#endif
-	//insert_blocked_process(remove_process(running), running->process_priority, BLOCKED_MEM_STATE);
-	//release_processor();
-	return 0x00;
+	insert_blocked_process(remove_process(running), running->process_priority, BLOCKED_MEM_STATE);
+	release_processor();	
+	return request_memory_block();
 }
 
 int release_memory_block(void * memory_block)
 {
-	//rtx_dbug_outs((CHAR *)"rtx: release_memory_block \r\n");
     int i;
 	for( i = 0; i < 32; i++){
 		if( memoryBlocks[i].location == memory_block && memoryBlocks[i].status == 1 )
 		{
 			memoryBlocks[i].status = 0;
-			return 0;
+			unblock_single_waiting_process();
+			return RTX_SUCCESS;
 		}
 	}
-	return -1;
+	#ifdef _ERR_
+		exception(CANNOT_RELEASE);
+	#endif
+	return RTX_ERROR;
 }

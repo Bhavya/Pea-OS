@@ -5,12 +5,10 @@
 #include "../messaging/messaging.h"
 #include "../memory/memory.h"
 
-volatile CHAR CharEnter[] = "\n\r";
-CHAR StringHack[] = "You Typed a Q\n\r";
+CHAR crlfgt[] = "\r\n>\0";	
 
-
-void store_message( BYTE msg_char ){
-	*(CHAR *)(kcd_msg + msg_length) = (CHAR)msg_char;
+void store_message( CHAR msg_char ){
+	*(CHAR *)(kcd_msg + msg_length) = msg_char;
 	msg_length++;
 	return;
 }
@@ -19,6 +17,7 @@ void clear_message(){
 	int i = 0;
 	while( i <= msg_length){
 		*(CHAR *)(kcd_msg + i) = 0x00;
+		i++;
 	}
 	msg_length = 0;
 	return;
@@ -27,13 +26,12 @@ void clear_message(){
 void uprintf( CHAR * string ){
 	BYTE interrupt_status;
 	int i = 0; 
-	while( string[i] != '\0' ){
+	while( string[i] != '\0'){
 		interrupt_status = SERIAL1_USR;
 		while (!(interrupt_status & 4))
 		{
 			interrupt_status = SERIAL1_USR;
 		}
-		//SERIAL1_IMR = 3;  
 		SERIAL1_WD = string[i];
 		i++;
 		SERIAL1_IMR = 2;
@@ -42,13 +40,32 @@ void uprintf( CHAR * string ){
 	return;	
 }
 
+void uprintn( int num, int length ){
+	CHAR string[2];
+	string[0] = (num + 48);
+	string[1] = '\0';
+	
+	BYTE interrupt_status;
+	int i = 0; 
+	while( string[i] != '\0'){
+		interrupt_status = SERIAL1_USR;
+		while (!(interrupt_status & 4))
+		{
+			interrupt_status = SERIAL1_USR;
+		}
+		SERIAL1_WD = string[i];
+		i++;
+		SERIAL1_IMR = 2;
+		interrupt_status = 0x00;
+	}	
+	return;	
+}
 
 VOID c_serial_handler( VOID )
 {
 	atomic_up();
 	
 	CharIn = '\0';
-	CHAR crlf[] = "\r\n>\0";	
 	BYTE interrupt_status;
     interrupt_status = SERIAL1_USR;    
 	SERIAL1_IMR = 3;
@@ -67,13 +84,13 @@ VOID c_serial_handler( VOID )
     {
 		switch(CharIn){
 			case '\r':
-				uprintf(crlf);
+				uprintf(crlfgt);
 				if(command_flag == 1){
+					store_message((CHAR)'\0');
 					void * p = request_memory_block();
-					send_message(KCD_PID, write_message(p, kcd_msg));
+					send_message(KCD_PID,write_message(p, kcd_msg));
 					command_flag = 0;
 					clear_message();
-					display_queue_all();
 				}
 				break;
 			case '%':
@@ -96,7 +113,7 @@ VOID c_serial_handler( VOID )
 				break;
 			default:
 				if(command_flag == 1){
-					store_message(CharOut);
+					store_message((CHAR)CharOut);
 				}
 				SERIAL1_WD = CharOut;
 				break;
