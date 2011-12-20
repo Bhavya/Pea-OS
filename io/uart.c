@@ -100,16 +100,16 @@ VOID c_serial_handler( VOID )
 			case '!':
 				SERIAL1_WD = CharOut;
 				display_queue_all();	
-				sleep(5);
+				sleep(6);
 				break;
 			case '@':
 				SERIAL1_WD = CharOut;
 				task_manager();	
-				sleep(5);
+				sleep(6);
 				break;
 			case '#':
-				break;
-			case '$':
+				display_mailbox();
+				sleep(6);
 				break;
 			default:
 				if(command_flag == 1){
@@ -122,12 +122,4 @@ VOID c_serial_handler( VOID )
 	
 	atomic_down();
     return;
-}
-
-command_key * register_command( CHAR * key ){
-	init_key_tail = (command_key *)malloc(sizeof(command_key));
-	*(init_key_tail->keystroke) = *key;
-	init_key_tail->next_key = NULL;
-	init_key_tail = init_key_tail->next_key;
-	return init_key_tail;
 }

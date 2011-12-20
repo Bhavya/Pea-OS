@@ -25,7 +25,6 @@ int send_message (int process_ID, void * MessageEnvelope)
 			mailbox[message].msg_body = MessageEnvelope;
 			red_lever++;
 		}	
-		
 		if(red_lever > 0){
 			pot_blocked = find_blocked_proc_by_id(process_ID);
 			if(pot_blocked > 0x00){
@@ -71,7 +70,33 @@ void * receive_message(int * sender_ID)
 
 int delayed_send(int process_ID, void * MessageEnvelope, int delay)
 {
-    return 0;
+	if(process_ID >= 1 || process_ID <= NUM_PROCESSES || process_ID == KCD_PID || process_ID == WALLCLOCK_PID){
+		int message = 0;
+		while(delayed_mailbox[message].sender_ID != -1){
+			message++;		
+		}	
+		if(message > 31){
+			#ifdef _ERR_
+				exception(MAILBOX_FULL);
+			#endif
+			return RTX_ERROR;
+		} else {
+			delayed_mailbox[message].sender_ID = running->process_ID;
+			delayed_mailbox[message].destination_ID = process_ID;
+			delayed_mailbox[message].delay = delay;
+			delayed_mailbox[message].msg_body = MessageEnvelope;
+			red_lever++;
+		}	
+		return message;
+	} else {
+		#ifdef _ERR_
+			exception(MSG_INVALID_PROCESS);
+		#endif
+	}
+	#ifdef _ERR_
+		exception(ERROR);
+	#endif
+    return RTX_ERROR;
 }
 
 void unblock_waiting_procs(){
@@ -122,6 +147,26 @@ void * write_message( void * memory_block, CHAR * msg ){
 CHAR * read_message( void * memory_block){
 	CHAR * s = (CHAR *)(memory_block+64);
 	return s;
+}
+
+void decrement_delayed_mailbox(){
+	int i;
+	int index;
+	for(i = 0; i< 32; i++){
+		if(delayed_mailbox[i].sender_ID != -1){
+			delayed_mailbox[i].delay--;
+			if(delayed_mailbox[i].delay == 0){
+				index = send_message(delayed_mailbox[i].destination_ID, delayed_mailbox[i].msg_body);
+				mailbox[index].sender_ID = delayed_mailbox[i].sender_ID;
+				
+				delayed_mailbox[i].sender_ID = -1;
+				delayed_mailbox[i].destination_ID = -1;
+				delayed_mailbox[i].msg_type = -1;
+				delayed_mailbox[i].delay = -1;
+			}
+		}
+	}
+	return;
 }
 
 

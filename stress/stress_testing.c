@@ -14,91 +14,24 @@
 #include "../debug/dbug.h"
 #include "../shared/define.h"
 #include "../io/uart.h"
+#include "../messaging/messaging.h"
 
-#define NUM_TEST_PROCS 3
 #define STRESS_A_PID 1
-#define STRESS_A_PID 2
+#define STRESS_B_PID 2
 #define STRESS_C_PID 3
 
 #define COUNT_REPORT 1
 #define WAKEUP_10 2
 
-int index;
+int ml_index;
 struct node{
 	void * a;
 	void * n;
 };
-typedef node node;
-
-void stress_a(){
-	int num;
-	void * p = request_memory_block();
-	register_command((CHAR *)"Z");
-	while(1){
-		if(current_command->keystroke) == OTHER){
-			release_memory_block(p);
-			break;
-		} else {
-			release_memory_block(p);
-		}
-	}
-	num = 0;
-	while(1){
-		p = request_memory_block();
-		index = send_message(STRESS_A_PID, p);
-		set_message_type(index, COUNT_REPORT);
-		*((int *)(p+64)) = num;
-		num++;
-		release_processor();
-	}
-	return;
-}
-
-void stress_b(){
-	void * p;
-	while(1){
-		p = receive_message(NULL);
-		index = send_message(STRESS_C_PID, p);
-		set_message_type(index, COUNT_REPORT);
-	}	
-	return;
-}
-
-void stress_c(){
-	void * p;
-	void * q;
-	node * head = (node *)malloc(sizeof(node));
-	node *tail;
-	queue_size = 0;
-	
-	while(1){
-		if(queue_size == 0){
-			p = receive_message();
-			head = enqueue(p);
-		} else {
-			p = dequeue();
-			queue_size--;
-		}
-		if(message_type(index) == COUNT_REPORT){
-			if(*((int*)(p+64))%20 == 0){
-				uprintf((CHAR *)"Process C");
-			}
-			q = request_memory_block();
-			index = delayed_send(STRESS_C_PID, q, 10);
-			set_message_type(index, WAKEUP_10);
-			while(1){
-				p = receive_message(NULL);
-				if(message_type(index) == WAKEUP_10){
-					break;
-				}
-			} else {
-				enqueue(p);
-			}
-		}	
-		release_processor();		
-	}	
-	return;
-}
+typedef struct node node;
+node * head;
+node * tail;
+queue_size = 0;
 
 node * enqueue(void * a){
 	tail->n = (node*)malloc(sizeof(node));
@@ -112,6 +45,73 @@ node * dequeue(){
 	node * temp = head;
 	head = head->n;
 	return temp;
+}
+
+void stress_a(){
+	int num;
+	void * p = g_test_fixture.request_memory_block();
+	register_command((CHAR *)"Z");
+	while(1){
+		if(current_command == OTHER){
+			g_test_fixture.release_memory_block(p);
+			break;
+		} else {
+			g_test_fixture.release_memory_block(p);
+		}
+	}
+	num = 0;
+	while(1){
+		p = g_test_fixture.request_memory_block();
+		ml_index = g_test_fixture.send_message(STRESS_A_PID, p);
+		set_message_type(ml_index, COUNT_REPORT);
+		*((int *)(p+64)) = num;
+		num++;
+		g_test_fixture.release_processor();
+	}
+	return;
+}
+
+void stress_b(){
+	void * p;
+	while(1){
+		p = g_test_fixture.receive_message(NULL);
+		ml_index = g_test_fixture.send_message(STRESS_C_PID, p);
+		set_message_type(ml_index, COUNT_REPORT);
+	}	
+	return;
+}
+
+void stress_c(){
+	void * p;
+	void * q;
+	head = (node *)malloc(sizeof(node));
+	while(1){
+		if(queue_size == 0){
+			p = g_test_fixture.receive_message(NULL);
+			head = enqueue(p);
+		} else {
+			p = dequeue();
+			queue_size--;
+		}
+		if(message_type(ml_index) == COUNT_REPORT){
+			if(*((int*)(p+64))%20 == 0){
+				uprintf((CHAR *)"Process C");
+			}
+			q = g_test_fixture.request_memory_block();
+			ml_index = g_test_fixture.delayed_send(STRESS_C_PID, q, 10);
+			set_message_type(ml_index, WAKEUP_10);
+			while(1){
+				p = g_test_fixture.receive_message(NULL);
+				if(message_type(ml_index) == WAKEUP_10){
+					break;
+				} else {
+					enqueue(p);
+				}
+			} 
+		}	
+		g_test_fixture.release_processor();		
+	}	
+	return;
 }
 
 /* register the third party test processes with RTX */

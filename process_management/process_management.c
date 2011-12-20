@@ -19,6 +19,10 @@ void process_bootstrap( pcb * control_block ){
 	total_procs--;
 	if(total_procs > 0){
 		release_processor();
+	} else {
+		rtx_dbug_outs((CHAR *)"rtx: All running processes have terminated.\r\n");
+		asm("move.l #0,%d0");
+		asm("TRAP #15");
 	}
 	return;
 }
@@ -250,6 +254,22 @@ void context_switch(){
 	return;
 }
 
+pcb * find__proc_by_id(int process_ID){
+	pcb * temp;
+	int i;
+	for(i = 0; i < 4; i++){
+		temp = ready_queue[i];
+		while(temp != NULL){
+			if(temp->process_ID == process_ID){
+				return temp;
+			} else {
+				temp = temp->next_process;
+			}
+		}
+	}
+	return 0x00;
+}
+
 pcb * find_blocked_proc_by_id(int process_ID){
 	pcb * temp;
 	int i;
@@ -275,3 +295,4 @@ void atomic_down(){
 	asm("move.w #0x2000, %sr");	
 	return;
 }
+

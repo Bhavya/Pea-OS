@@ -50,6 +50,11 @@ void init_mailbox()
 		mailbox[i].destination_ID = -1;
 		mailbox[i].msg_type = -1;
 		mailbox[i].delay = -1;
+		
+		delayed_mailbox[i].sender_ID = -1;
+		delayed_mailbox[i].destination_ID = -1;
+		delayed_mailbox[i].msg_type = -1;
+		delayed_mailbox[i].delay = -1;
 	}
 	return;
 }

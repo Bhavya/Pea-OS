@@ -72,6 +72,7 @@ struct msgEnvelope
 typedef struct msgEnvelope msgEnvelope;
 
 msgEnvelope mailbox[32];
+msgEnvelope delayed_mailbox[32];
 
 int red_lever;
 int * sender_ID;
@@ -101,7 +102,8 @@ enum command
 	WS,
 	WT,
 	C,
-	OTHER
+	OTHER,
+	INVALID
 };
 
 typedef enum command command;
@@ -138,5 +140,4 @@ VOID task_manager( void );
 VOID display_queue( state );
 VOID display_queue_all( void );
 VOID display_mailbox();
-VOID display_msg_log();
 VOID display_hotkeys();

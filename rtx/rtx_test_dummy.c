@@ -10,49 +10,25 @@
  * @brief:  rtx test suite 
  */
 
-#include "rtx_test.h"
+ /*please fix as necessary*/
+#include "../rtx/rtx_test.h"
 #include "../debug/dbug.h"
 #include "../shared/define.h"
-#include "../io/uart.h"
-#include "../messaging/messaging.h"
-
-UINT32 RTX_SUCCESS_COUNT;
-UINT32 RTX_FAIL_COUNT;
-int return_value;
-void * received;
-void * mblocks[32];
-
-void success_rate(int success, int failure){
-	rtx_dbug_outs_int((CHAR *)"\r\nPassed ", success);
-	rtx_dbug_outs_int((CHAR *)" out of ", (success + failure));
-	rtx_dbug_outs((CHAR *)"\r\n");
-	RTX_SUCCESS_COUNT += success;
-	RTX_FAIL_COUNT += failure;
-	return;
-}
 
 /* third party dummy test process 1 */ 
 void test1()
 {
 	while(1){
-		rtx_dbug_outs((CHAR *)"\r\nTest1");
-		/*void * p;
-		p = g_test_fixture.receive_message(NULL);*/
+		rtx_dbug_outs((CHAR *)"\r\nTest 1");
 		g_test_fixture.release_processor();
 	}
-	return;
 }
 
 /* third party dummy test process 2 */ 
 void test2()
 {
 	while(1){
-		rtx_dbug_outs((CHAR *)"\r\nTest2");
-		/*int i;
-		void * p[33];
-		for(i=0; i<33; i++){
-			p[i] = g_test_fixture.request_memory_block();
-		}*/
+		rtx_dbug_outs((CHAR *)"\r\nTest 2");
 		g_test_fixture.release_processor();
 	}
 	return;
@@ -61,7 +37,7 @@ void test2()
 void test3()
 {
 	while(1){
-		rtx_dbug_outs((CHAR *)"\r\nTest3");
+		rtx_dbug_outs((CHAR *)"\r\nTest 3");
 		g_test_fixture.release_processor();
 	}
 	return;
@@ -71,7 +47,7 @@ void test3()
 void test4()
 {
 	while(1){
-		rtx_dbug_outs((CHAR *)"\r\nTest4");
+		rtx_dbug_outs((CHAR *)"\r\nTest 4");
 		g_test_fixture.release_processor();
 	}
 	return;
@@ -80,22 +56,18 @@ void test4()
 void test5()
 {
 	while(1){
-		rtx_dbug_outs((CHAR *)"\r\nTest5");
+		rtx_dbug_outs((CHAR *)"\r\nTest 5");
 		g_test_fixture.release_processor();
-	};
+	}
 	return;
 }
 /* third party dummy test process 6 */ 
 void test6()
 {
-	rtx_dbug_outs((CHAR *)"\r\nTest6");
-	g_test_fixture.release_processor();
-	rtx_dbug_outs((CHAR *)"\r\nTest6");
-	g_test_fixture.release_processor();
-	rtx_dbug_outs((CHAR *)"\r\nTest6");
-	g_test_fixture.release_processor();
-	rtx_dbug_outs((CHAR *)"\r\nTest6");
-	g_test_fixture.release_processor();
+	while(1){
+		rtx_dbug_outs((CHAR *)"\r\nTest 6");
+		g_test_fixture.release_processor();
+	}
 	return;
 }
 

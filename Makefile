@@ -17,10 +17,12 @@ ASM=./main/start.s process_management/process_stack.s io/serial_entry.s timer/ti
 LDFLAGS_RTX = -Trtx/rtx.ld -Wl,-Map=rtx/rtx.map
 LDFLAGS_RTX_LOADER = -Trtx/rtx_loader.ld -Wl,-Map=rtx/rtx_loader.map
 LDFLAGS_RTX_TEST = -Trtx/rtx_test.ld -Wl,-Map=rtx/rtx_test.map
+LDFLAGS_STRESS_TEST = -Trtx/rtx_test.ld -Wl,-Map=rtx/rtx_test.map
 
 RTX_OBJS = rtx.o dbug.o main_rtx.o memory.o messaging.o priority.o process_management.o uart.o kcd.o crt.o timer.o init.o
 RTX_LOADER_OBJS = rtx.o dbug.o rtx_loader.o memory.o messaging.o priority.o process_management.o uart.o kcd.o crt.o timer.o init.o
 RTX_TEST_DUMMY_OBJS = rtx.o dbug.o rtx_test_dummy.o memory.o messaging.o priority.o process_management.o kcd.o crt.o uart.o timer.o init.o
+STRESS_TEST_OBJS = rtx.o dbug.o stress_testing.o memory.o messaging.o priority.o process_management.o kcd.o crt.o uart.o timer.o init.o
 
 all: mdummy.s19 
 
@@ -42,6 +44,11 @@ rtx_test_dummy.s19: $(RTX_TEST_DUMMY_OBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS_RTX_TEST) -o rtx_test_dummy.bin $(ASM) $(RTX_TEST_DUMMY_OBJS) 
 	$(OBJCPY) --output-format=srec rtx_test_dummy.bin rtx_test_dummy.s19
 	$(OBJDUMP) -xdC rtx_test_dummy.bin > rtx_test_dummy.lst
+	
+stress_testing.s19: $(STRESS_TEST_OBJS) 
+	$(CC) $(CFLAGS) $(LDFLAGS_STRESS_TEST) -o stress_testing.bin $(ASM) $(STRESS_TEST_OBJS) 
+	$(OBJCPY) --output-format=srec stress_testing.bin stress_testing.s19
+	$(OBJDUMP) -xdC stress_testing.bin > stress_testing.lst
 
 m2.s19: rtx_test_dummy.s19 rtx.s19
 	python merge.py m2.s19 rtx.s19 rtx_test_dummy.s19 
@@ -86,6 +93,9 @@ dbug.o: debug/dbug.c debug/dbug.h
 
 rtx_loader.o: rtx/rtx_loader.c 
 	$(CC) $(CFLAGS) -c rtx/rtx_loader.c
+
+stress_testing.o: stress/stress_testing.c 
+	$(CC) $(CFLAGS) -c stress/stress_testing.c
 	
 rtx_test_dummy.o: rtx/rtx_test_dummy.c rtx/rtx_test.h
 	$(CC) $(CFLAGS) -c rtx/rtx_test_dummy.c
@@ -98,4 +108,4 @@ rtx.o: rtx/rtx.c rtx/rtx.h
 
 .PHONY: clean
 clean:
-	rm -f *.bin *.o *.map 
+	rm -f *.bin *.o *.map *.lst *.s19

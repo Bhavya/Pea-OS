@@ -10,15 +10,16 @@ init_key_head       0x4               dbug.o
 running             0x4               dbug.o
 mailbox             0x280             dbug.o
 init_key_tail       0x4               dbug.o
+delayed_mailbox     0x280             dbug.o
 CharIn              0x1               dbug.o
-old_stack           0x4               /tmp/cciKR90q.o
+old_stack           0x4               /tmp/ccRqinn5.o
 memoryBlocks        0x100             dbug.o
 temp_sp             0x4               dbug.o
 proc_pointer        0x4               dbug.o
 ready_queue         0x10              dbug.o
 msg_length          0x4               dbug.o
 command_flag        0x4               dbug.o
-main_stack          0x1000            /tmp/cciKR90q.o
+main_stack          0x1000            /tmp/ccRqinn5.o
 current_command     0x4               dbug.o
 red_lever           0x4               dbug.o
 sender_ID           0x4               dbug.o
@@ -36,11 +37,11 @@ ram              0x10100000         0x00100000
 
 Linker script and memory map
 
-LOAD /tmp/cciKR90q.o
-LOAD /tmp/ccmutrsI.o
-LOAD /tmp/ccM7tOP2.o
-LOAD /tmp/ccuYWENn.o
-LOAD /tmp/ccMPQRZG.o
+LOAD /tmp/ccRqinn5.o
+LOAD /tmp/cc6A2du3.o
+LOAD /tmp/ccJj6W81.o
+LOAD /tmp/ccY91GAZ.o
+LOAD /tmp/ccHvwmdX.o
 LOAD rtx.o
 LOAD dbug.o
 LOAD main_rtx.o
@@ -62,218 +63,219 @@ END GROUP
                 0x00000000                PROVIDE (software_init_hook, 0x0)
                 0x00000000                PROVIDE (_software_init_hook, 0x0)
 
-.text           0x10100000     0x2b85
+.text           0x10100000     0x30c1
  *(.text)
- .text          0x10100000       0x1e /tmp/cciKR90q.o
+ .text          0x10100000       0x1e /tmp/ccRqinn5.o
  *fill*         0x1010001e        0x2 00
- .text          0x10100020       0x58 /tmp/ccmutrsI.o
+ .text          0x10100020       0x58 /tmp/cc6A2du3.o
                 0x10100020                process_switch
- .text          0x10100078       0x4c /tmp/ccM7tOP2.o
+ .text          0x10100078       0x4c /tmp/ccJj6W81.o
                 0x10100078                asm_serial_entry
- .text          0x101000c4       0x44 /tmp/ccuYWENn.o
+ .text          0x101000c4       0x44 /tmp/ccY91GAZ.o
                 0x101000c4                asm_timer_entry
- .text          0x10100108       0xa0 /tmp/ccMPQRZG.o
+ .text          0x10100108       0xa0 /tmp/ccHvwmdX.o
                 0x10100108                display_task_manager
                 0x10100158                display_all
  .text          0x101001a8       0x18 rtx.o
                 0x101001a8                coldfire_vbr_init
- .text          0x101001c0      0x508 dbug.o
+ .text          0x101001c0      0x594 dbug.o
                 0x1010047e                task_manager
                 0x10100536                display_queue
                 0x101001e0                rtx_dbug_outs
                 0x101006b0                display_mailbox
                 0x1010021c                rtx_dbug_out_block
-                0x101006b8                display_msg_log
                 0x101001c0                rtx_dbug_out_char
                 0x1010024c                print_int
-                0x101006c0                display_hotkeys
+                0x10100714                display_hotkeys
                 0x101002d4                exception
                 0x10100564                display_queue_all
                 0x101002b8                rtx_dbug_outs_int
- .text          0x101006c8      0x1f0 main_rtx.o
-                0x1010083a                __main
-                0x101006c8                create_processes
-                0x10100844                main
- .text          0x101008b8      0x23c memory.o
-                0x10100954                unblock_single_waiting_process
-                0x101008b8                malloc
-                0x101009cc                request_memory_block
-                0x10100900                proc_malloc
-                0x10100a7a                release_memory_block
- .text          0x10100af4      0x3d8 messaging.o
-                0x10100eb0                read_message
-                0x10100e3a                set_message_type
-                0x10100e1c                message_type
-                0x10100e5c                write_message
-                0x10100af4                send_message
-                0x10100d58                unblock_waiting_procs
-                0x10100c3a                receive_message
-                0x10100d4e                delayed_send
- .text          0x10100ecc      0x180 priority.o
-                0x10100fd6                get_process_priority
-                0x10100ecc                set_process_priority
- .text          0x1010104c      0x806 process_management.o
-                0x10101248                remove_process
-                0x101017d8                find_blocked_proc_by_id
-                0x10101058                process_bootstrap
-                0x101010a6                clear_priority
-                0x10101614                context_switch
-                0x10101472                remove_blocked_process
-                0x1010115c                insert_new_process
-                0x1010183a                atomic_up
-                0x10101846                atomic_down
-                0x101010b4                insert_process
-                0x1010104c                release_processor
-                0x10101316                insert_blocked_process
- *fill*         0x10101852        0x2 00
- .text          0x10101854      0x39a uart.o
-                0x101018ba                uprintf
-                0x10101ba4                register_command
-                0x10101924                uprintn
-                0x1010199e                c_serial_handler
-                0x10101886                clear_message
-                0x10101854                store_message
- *fill*         0x10101bee        0x2 00
- .text          0x10101bf0      0x2b6 kcd.o
-                0x10101bf0                kcd
- *fill*         0x10101ea6        0x2 00
- .text          0x10101ea8       0x42 crt.o
-                0x10101ea8                crt
- *fill*         0x10101eea        0x2 00
- .text          0x10101eec      0x398 timer.o
-                0x10101eec                c_timer_handler
-                0x1010227a                set_system_time
-                0x10101f22                wallclock
- .text          0x10102284      0x3e2 init.o
-                0x10102640                sleep
-                0x1010254a                init_timer
-                0x10102632                null_process
-                0x10102310                init_memory
-                0x10102436                init_scheduler
-                0x101023e6                init_queues
-                0x10102364                init_mailbox
-                0x10102482                init_io
-                0x101022e4                init_traps
-                0x1010258e                register_commands
-                0x10102284                create_pib
-                0x10102602                system_kickoff
-                0x10102668                . = ALIGN (0x4)
- *fill*         0x10102666        0x2 00
-                0x10102668                __CTOR_LIST__ = .
-                0x10102668        0x4 LONG 0x0 (((__CTOR_END__ - __CTOR_LIST__) / 0x4) - 0x2)
+ .text          0x10100754      0x1f0 main_rtx.o
+                0x101008c6                __main
+                0x10100754                create_processes
+                0x101008d0                main
+ .text          0x10100944      0x23c memory.o
+                0x101009e0                unblock_single_waiting_process
+                0x10100944                malloc
+                0x10100a58                request_memory_block
+                0x1010098c                proc_malloc
+                0x10100b06                release_memory_block
+ .text          0x10100b80      0x63e messaging.o
+                0x10101048                read_message
+                0x10100fd2                set_message_type
+                0x10100fb4                message_type
+                0x10100ff4                write_message
+                0x10100b80                send_message
+                0x10100ef0                unblock_waiting_procs
+                0x10101064                decrement_delayed_mailbox
+                0x10100cc6                receive_message
+                0x10100dda                delayed_send
+ *fill*         0x101011be        0x2 00
+ .text          0x101011c0      0x180 priority.o
+                0x101012ca                get_process_priority
+                0x101011c0                set_process_priority
+ .text          0x10101340      0x87c process_management.o
+                0x10101550                remove_process
+                0x10101ae0                find__proc_by_id
+                0x10101b42                find_blocked_proc_by_id
+                0x1010134c                process_bootstrap
+                0x101013ae                clear_priority
+                0x1010191c                context_switch
+                0x1010177a                remove_blocked_process
+                0x10101464                insert_new_process
+                0x10101ba4                atomic_up
+                0x10101bb0                atomic_down
+                0x101013bc                insert_process
+                0x10101340                release_processor
+                0x1010161e                insert_blocked_process
+ .text          0x10101bbc      0x31c uart.o
+                0x10101c22                uprintf
+                0x10101c8c                uprintn
+                0x10101d06                c_serial_handler
+                0x10101bee                clear_message
+                0x10101bbc                store_message
+ .text          0x10101ed8      0x4e2 kcd.o
+                0x10101f22                find_command
+                0x10101f52                kcd
+                0x10101ed8                register_command
+ *fill*         0x101023ba        0x2 00
+ .text          0x101023bc       0x42 crt.o
+                0x101023bc                crt
+ *fill*         0x101023fe        0x2 00
+ .text          0x10102400      0x312 timer.o
+                0x10102400                c_timer_handler
+                0x101026d6                set_system_time
+                0x10102460                wallclock
+ *fill*         0x10102712        0x2 00
+ .text          0x10102714      0x448 init.o
+                0x10102b36                sleep
+                0x10102a40                init_timer
+                0x10102b28                null_process
+                0x101027a0                init_memory
+                0x1010292c                init_scheduler
+                0x101028dc                init_queues
+                0x101027f4                init_mailbox
+                0x10102978                init_io
+                0x10102774                init_traps
+                0x10102a84                register_commands
+                0x10102714                create_pib
+                0x10102af8                system_kickoff
+                0x10102b5c                . = ALIGN (0x4)
+                0x10102b5c                __CTOR_LIST__ = .
+                0x10102b5c        0x4 LONG 0x0 (((__CTOR_END__ - __CTOR_LIST__) / 0x4) - 0x2)
  *(.ctors)
-                0x1010266c        0x4 LONG 0x0
-                0x10102670                __CTOR_END__ = .
-                0x10102670                __DTOR_LIST__ = .
-                0x10102670        0x4 LONG 0x0 (((__DTOR_END__ - __DTOR_LIST__) / 0x4) - 0x2)
+                0x10102b60        0x4 LONG 0x0
+                0x10102b64                __CTOR_END__ = .
+                0x10102b64                __DTOR_LIST__ = .
+                0x10102b64        0x4 LONG 0x0 (((__DTOR_END__ - __DTOR_LIST__) / 0x4) - 0x2)
  *(.dtors)
-                0x10102674        0x4 LONG 0x0
-                0x10102678                __DTOR_END__ = .
+                0x10102b68        0x4 LONG 0x0
+                0x10102b6c                __DTOR_END__ = .
  *(.rodata*)
- .rodata        0x10102678      0x3ef dbug.o
- .rodata        0x10102a67       0x6c main_rtx.o
- .rodata        0x10102ad3       0x23 process_management.o
- .rodata        0x10102af6       0x73 kcd.o
- .rodata        0x10102b69        0x2 timer.o
- .rodata        0x10102b6b        0xa init.o
+ .rodata        0x10102b6c      0x409 dbug.o
+ .rodata        0x10102f75       0x6c main_rtx.o
+ .rodata        0x10102fe1       0x51 process_management.o
+ .rodata        0x10103032       0x73 kcd.o
+ .rodata        0x101030a5        0x2 timer.o
+ .rodata        0x101030a7        0xa init.o
  *(.gcc_except_table)
-                0x10102b75                __INIT_SECTION__ = .
-                0x10102b75        0x4 LONG 0x4e560000
+                0x101030b1                __INIT_SECTION__ = .
+                0x101030b1        0x4 LONG 0x4e560000
  *(.init)
-                0x10102b79        0x2 SHORT 0x4e5e
-                0x10102b7b        0x2 SHORT 0x4e75
-                0x10102b7d                __FINI_SECTION__ = .
-                0x10102b7d        0x4 LONG 0x4e560000
+                0x101030b5        0x2 SHORT 0x4e5e
+                0x101030b7        0x2 SHORT 0x4e75
+                0x101030b9                __FINI_SECTION__ = .
+                0x101030b9        0x4 LONG 0x4e560000
  *(.fini)
-                0x10102b81        0x2 SHORT 0x4e5e
-                0x10102b83        0x2 SHORT 0x4e75
-                0x10102b85                _etext = .
+                0x101030bd        0x2 SHORT 0x4e5e
+                0x101030bf        0x2 SHORT 0x4e75
+                0x101030c1                _etext = .
  *(.lit)
 
-.data           0x10102b88       0x20
+.data           0x101030c4       0x20
  *(.shdata)
  *(.data)
- .data          0x10102b88        0x0 /tmp/cciKR90q.o
- .data          0x10102b88        0x0 /tmp/ccmutrsI.o
- .data          0x10102b88        0x0 /tmp/ccM7tOP2.o
- .data          0x10102b88        0x0 /tmp/ccuYWENn.o
- .data          0x10102b88        0x0 /tmp/ccMPQRZG.o
- .data          0x10102b88        0x0 rtx.o
- .data          0x10102b88        0x0 dbug.o
- .data          0x10102b88        0x0 main_rtx.o
- .data          0x10102b88        0x4 memory.o
-                0x10102b88                heap
- .data          0x10102b8c        0x0 messaging.o
- .data          0x10102b8c        0x0 priority.o
- .data          0x10102b8c        0x0 process_management.o
- .data          0x10102b8c        0x5 uart.o
-                0x10102b8c                crlfgt
- *fill*         0x10102b91        0x3 00
- .data          0x10102b94        0x0 kcd.o
- .data          0x10102b94        0x0 crt.o
- .data          0x10102b94       0x12 timer.o
-                0x10102b94                crlf
-                0x10102ba2                Ticks
-                0x10102b98                TimeString
- *fill*         0x10102ba6        0x2 00
- .data          0x10102ba8        0x0 init.o
-                0x10102ba8                _edata = .
+ .data          0x101030c4        0x0 /tmp/ccRqinn5.o
+ .data          0x101030c4        0x0 /tmp/cc6A2du3.o
+ .data          0x101030c4        0x0 /tmp/ccJj6W81.o
+ .data          0x101030c4        0x0 /tmp/ccY91GAZ.o
+ .data          0x101030c4        0x0 /tmp/ccHvwmdX.o
+ .data          0x101030c4        0x0 rtx.o
+ .data          0x101030c4        0x0 dbug.o
+ .data          0x101030c4        0x0 main_rtx.o
+ .data          0x101030c4        0x4 memory.o
+                0x101030c4                heap
+ .data          0x101030c8        0x0 messaging.o
+ .data          0x101030c8        0x0 priority.o
+ .data          0x101030c8        0x0 process_management.o
+ .data          0x101030c8        0x5 uart.o
+                0x101030c8                crlfgt
+ *fill*         0x101030cd        0x3 00
+ .data          0x101030d0        0x0 kcd.o
+ .data          0x101030d0        0x0 crt.o
+ .data          0x101030d0       0x12 timer.o
+                0x101030d0                crlf
+                0x101030de                Ticks
+                0x101030d4                TimeString
+ *fill*         0x101030e2        0x2 00
+ .data          0x101030e4        0x0 init.o
+                0x101030e4                _edata = .
 
-.bss            0x10102ba8     0x141c
-                0x10102ba8                __bss_start = .
+.bss            0x101030e4     0x1690
+                0x101030e4                __bss_start = .
  *(.shbss)
  *(.bss)
- .bss           0x10102ba8        0x0 /tmp/cciKR90q.o
- .bss           0x10102ba8        0x0 /tmp/ccmutrsI.o
- .bss           0x10102ba8        0x0 /tmp/ccM7tOP2.o
- .bss           0x10102ba8        0x0 /tmp/ccuYWENn.o
- .bss           0x10102ba8        0x0 /tmp/ccMPQRZG.o
- .bss           0x10102ba8        0x0 rtx.o
- .bss           0x10102ba8        0x0 dbug.o
- .bss           0x10102ba8        0x0 main_rtx.o
- .bss           0x10102ba8        0x0 memory.o
- .bss           0x10102ba8        0x0 messaging.o
- .bss           0x10102ba8        0x0 priority.o
- .bss           0x10102ba8        0x0 process_management.o
- .bss           0x10102ba8        0x0 uart.o
- .bss           0x10102ba8        0x0 kcd.o
- .bss           0x10102ba8        0x0 crt.o
- .bss           0x10102ba8        0xc timer.o
-                0x10102ba8                Hours
-                0x10102bac                Minutes
-                0x10102bb0                Seconds
- .bss           0x10102bb4        0x0 init.o
+ .bss           0x101030e4        0x0 /tmp/ccRqinn5.o
+ .bss           0x101030e4        0x0 /tmp/cc6A2du3.o
+ .bss           0x101030e4        0x0 /tmp/ccJj6W81.o
+ .bss           0x101030e4        0x0 /tmp/ccY91GAZ.o
+ .bss           0x101030e4        0x0 /tmp/ccHvwmdX.o
+ .bss           0x101030e4        0x0 rtx.o
+ .bss           0x101030e4        0x0 dbug.o
+ .bss           0x101030e4        0x0 main_rtx.o
+ .bss           0x101030e4        0x0 memory.o
+ .bss           0x101030e4        0x0 messaging.o
+ .bss           0x101030e4        0x0 priority.o
+ .bss           0x101030e4        0x0 process_management.o
+ .bss           0x101030e4        0x0 uart.o
+ .bss           0x101030e4        0x0 kcd.o
+ .bss           0x101030e4        0x0 crt.o
+ .bss           0x101030e4        0xc timer.o
+                0x101030e4                Hours
+                0x101030e8                Minutes
+                0x101030ec                Seconds
+ .bss           0x101030f0        0x0 init.o
  *(COMMON)
- *fill*         0x10102bb4        0xc 00
- COMMON         0x10102bc0     0x1010 /tmp/cciKR90q.o
-                0x10102bc0                old_stack
-                0x10102bd0                main_stack
- COMMON         0x10103bd0      0x3f4 dbug.o
-                0x10103bd0                old_fp
-                0x10103bd4                bmem_queue
-                0x10103be4                prio
-                0x10103be8                bmsg_queue
-                0x10103bf8                init_key_head
-                0x10103bfc                running
-                0x10103c00                mailbox
-                0x10103e80                init_key_tail
-                0x10103e84                CharIn
-                0x10103e86                memoryBlocks
-                0x10103f86                temp_sp
-                0x10103f8a                proc_pointer
-                0x10103f8e                ready_queue
-                0x10103f9e                msg_length
-                0x10103fa2                command_flag
-                0x10103fa6                current_command
-                0x10103faa                red_lever
-                0x10103fae                sender_ID
-                0x10103fb2                timer_display
-                0x10103fb6                init_blocks_head
-                0x10103fba                total_procs
-                0x10103fbe                CharOut
-                0x10103fc0                kcd_msg
-                0x10103fc8                _end = ALIGN (0x8)
-                0x10103fc8                __end = _end
+ COMMON         0x101030f0     0x1010 /tmp/ccRqinn5.o
+                0x101030f0                old_stack
+                0x10103100                main_stack
+ COMMON         0x10104100      0x674 dbug.o
+                0x10104100                old_fp
+                0x10104104                bmem_queue
+                0x10104114                prio
+                0x10104118                bmsg_queue
+                0x10104128                init_key_head
+                0x1010412c                running
+                0x10104130                mailbox
+                0x101043b0                init_key_tail
+                0x101043b4                delayed_mailbox
+                0x10104634                CharIn
+                0x10104636                memoryBlocks
+                0x10104736                temp_sp
+                0x1010473a                proc_pointer
+                0x1010473e                ready_queue
+                0x1010474e                msg_length
+                0x10104752                command_flag
+                0x10104756                current_command
+                0x1010475a                red_lever
+                0x1010475e                sender_ID
+                0x10104762                timer_display
+                0x10104766                init_blocks_head
+                0x1010476a                total_procs
+                0x1010476e                CharOut
+                0x10104770                kcd_msg
+                0x10104778                _end = ALIGN (0x8)
+                0x10104778                __end = _end
 
 .stab
  *(.stab)

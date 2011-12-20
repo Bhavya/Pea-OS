@@ -24,6 +24,10 @@ VOID c_timer_handler( VOID )
 		Ticks = 0;
 	}
     TIMER0_TER = 2;
+
+	if(Ticks%100 == 0){
+		decrement_delayed_mailbox();
+	}
 	return;
 }
 
@@ -83,17 +87,6 @@ void wallclock(){
 		if(command_flag == 1 && current_command == W){
 			msg = receive_message(NULL);
 			s = read_message(msg);
-			if(*(s+1) == 'S'){
-				Hours = (*(s+2) - 48)*10;
-				Hours += *(s+3) - 48;
-				
-				Minutes = (*(s+5) - 48)*10;
-				Minutes += *(s+6) - 48;
-				
-				Seconds = (*(s+8) - 48)*10;
-				Seconds += *(s+9) - 48;
-				uprintf(s);
-			}
 			current_command = W;
 			release_memory_block(msg);
 		}	
@@ -101,6 +94,6 @@ void wallclock(){
 }
 
 int set_system_time(int hh, int mm, int ss){
-
+	Ticks = (hh*3600 + mm*60 + ss)*100;
 	return 0;
 }

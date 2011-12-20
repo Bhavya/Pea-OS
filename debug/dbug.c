@@ -191,13 +191,20 @@ VOID display_queue_all(){
 }
 
 VOID display_mailbox(){
-	return;
-}
-
-VOID display_msg_log(){
+	int i;
+	for(i = 0; i<32; i++){
+		rtx_dbug_outs_int((CHAR *)"\r\n\r\nSender: ", mailbox[i].sender_ID);
+		rtx_dbug_outs_int((CHAR *)"\r\nReceiver: ", mailbox[i].destination_ID);
+	}
 	return;
 }
 
 VOID display_hotkeys(){
-
+	command_key * temp = init_key_head;
+	while(temp != NULL){
+		rtx_dbug_outs((CHAR *)"\r\n");
+		rtx_dbug_outs(temp->keystroke);
+		temp = temp->next_key;
+	}
+	return;
 }

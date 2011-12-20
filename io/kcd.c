@@ -5,6 +5,22 @@
 #include "../messaging/messaging.h"
 #include "../memory/memory.h"
 #include "../priority/priority.h"
+#include "../timer/timer.h"
+
+command_key * register_command( CHAR * key ){
+	init_key_tail = (command_key *)malloc(sizeof(command_key));
+	*(init_key_tail->keystroke) = *key;
+	init_key_tail->next_key = NULL;
+	init_key_tail = init_key_tail->next_key;
+	return init_key_tail;
+}
+
+int find_command(CHAR * s){
+	if(*(init_key_tail->keystroke) == *s){
+		return RTX_SUCCESS;
+	}
+	return RTX_ERROR;
+}
 
 void kcd(){
 	void * msg;
@@ -12,6 +28,9 @@ void kcd(){
 	int process = 0;
 	int priority = 0;
 	int result = 0;
+	int hh = 0;
+	int mm = 0;
+	int ss = 0;
 	while(1){
 		msg = receive_message(NULL);
 		CHAR * s = read_message(msg);
@@ -20,9 +39,29 @@ void kcd(){
 				p = request_memory_block();
 				switch(*(s+1)){
 					case 'S':
-						send_message(WALLCLOCK_PID, msg);
-						current_command = WS;
-						release_memory_block(p);
+						if((*(s+2)-48)>2 || (*(s+3)-48)>9 || (*(s+5)-48)>5 || (*(s+6)-48)>9 || (*(s+8)-48)>5 || (*(s+9)-48)>9){
+							#ifdef _ERR_
+								exception(INVALID_TIMESTAMP);
+							#endif
+						} else if(*(s+4) != ':' || *(s+7) != ':'){
+							#ifdef _ERR_
+								exception(INVALID_TIMESTAMP);
+							#endif
+						} else {
+							hh = (*(s+2)-48)*10;
+							hh += (*(s+3)-48);
+							mm = (*(s+5)-48)*10;
+							mm += (*(s+6)-48);
+							ss = (*(s+8)-48)*10;
+							ss += (*(s+9)-48);
+							set_system_time(hh,mm,ss);
+							send_message(WALLCLOCK_PID, p);
+							current_command = WS;
+						}
+						while(*s != 0x00 || *s != '\0'){
+							*s = 0x00;
+							s++;
+						}
 						break;
 					case 'T':
 						timer_display = 0;
@@ -85,11 +124,14 @@ void kcd(){
 				break;
 			default:
 				if(timer_display == 0){
-					current_command = OTHER;
-					#ifdef _ERR_
-						sleep(1);
-						exception(INVALID_COMMAND);
-					#endif
+					if(find_command(s) == -1){
+						current_command = OTHER;
+						#ifdef _ERR_
+							exception(INVALID_COMMAND);
+						#endif
+					} else {
+						current_command = OTHER;
+					}
 				} else {
 					#ifdef _ERR_
 						exception(WALLCLOCK_RUNNING);
