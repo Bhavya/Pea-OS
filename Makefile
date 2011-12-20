@@ -1,9 +1,3 @@
-# Makefile Winter 2011 
-# by
-# David Grant
-# Thomas Reidemeister
-# Irene Huang
-
 CC=m68k-elf-gcc
 CXX=m68k-elf-g++
 CFLAGS= -Wall -m5307 -pipe -nostdlib
