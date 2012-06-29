@@ -5,7 +5,6 @@
 /**
  * @file:   rtx_test_dummy.c   
  * @author: Bhavya Kashyap
- * @author: Kristof Dorgai
  * @date:   2011.07.11
  * @brief:  rtx stress test suite 
  */
